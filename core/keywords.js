@@ -60,24 +60,26 @@ function extractRegistryKeywords(name, description, content) {
 // Tag inference rules based on question/answer content (Two-Level Tag System)
 const TAG_RULES = [
   // Domains
-  { match: /inventory|kho|stock|lot|material|nguyên.vật/i, tag: 'domain:inventory' },
-  { match: /production|sản.xuất|job|schedule|bom|partlist/i, tag: 'domain:production' },
+  { match: /inventory|\bkho\b|stock|material|nguyên.vật/i, tag: 'domain:inventory' },
+  { match: /production|sản.xuất|\bschedule\b|\bbom\b|partlist/i, tag: 'domain:production' },
   { match: /sales|bán.hàng|packing|order/i, tag: 'domain:sales' },
   { match: /inspection|kiểm.tra|qc|quality|dipes/i, tag: 'domain:inspection' },
   { match: /handover|bàn.giao|chuyển.giao/i, tag: 'domain:handover' },
-  { match: /tss|ticket|warranty|case/i, tag: 'domain:tss' },
-  
+  { match: /\btss\b|\bticket\b|warranty/i, tag: 'domain:tss' },
+
   // Tech
-  { match: /ua|universe\s*arch|thin.view|controller.deleg|service.layer/i, tag: 'tech:ua' },
+  // Short tokens are word-anchored: bare substrings like "ua" (manual) or "case"
+  // (lowercase) must not tag unrelated prose.
+  { match: /\bua\b|universe\s*arch|thin.view|controller.deleg|service.layer/i, tag: 'tech:ua' },
   { match: /winform|xtraform|baseform/i, tag: 'tech:winforms' },
-  { match: /devexpress|grid|gridview|gridcontrol|column|row/i, tag: 'tech:devexpress' },
-  { match: /async|await|task|thread|queue|enqueue/i, tag: 'tech:async' },
-  { match: /permission|quyền|security|phân.quyền|acl/i, tag: 'tech:permission' },
-  
+  { match: /devexpress|xtragrid|xtrareport|gridcontrol|gridview|lookupedit/i, tag: 'tech:devexpress' },
+  { match: /\basync\b|\bawait\b|\bthreads?\b|\bqueues?\b|enqueue/i, tag: 'tech:async' },
+  { match: /permission|quyền|security|phân.quyền|\bacl\b/i, tag: 'tech:permission' },
+
   // Pattern / Type
   { match: /bug|lỗi|fix|error|exception|crash/i, tag: 'type:bug' },
   { match: /refactor|modernize|migrate|upgrade/i, tag: 'type:refactor' },
-  { match: /dto|data.transfer|model|viewmodel/i, tag: 'pattern:dto' },
+  { match: /\bdto\b|data.transfer|\bviewmodel\b/i, tag: 'pattern:dto' },
   { match: /save|insert|update|delete|crud|submit/i, tag: 'pattern:crud' },
   { match: /architect|design|solid|pattern/i, tag: 'pattern:architecture' }
 ];

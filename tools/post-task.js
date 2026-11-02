@@ -25,10 +25,14 @@ const PINNED = process.argv.includes('--pinned');
 const FORCE = process.argv.includes('--force');
 
 // Parse args
-const TAGS = process.argv.find(a => a.startsWith('--tags='))?.split('=')[1] || '';
-const FILE_ARG = process.argv.find(a => a.startsWith('--file='))?.split('=')[1];
-const JSON_ARG = process.argv.find(a => a.startsWith('--json='))?.slice('--json='.length);
-const PROJECT_ARG = process.argv.find(a => a.startsWith('--project='))?.split('=')[1]?.toLowerCase() || '';
+const argValue = (prefix) => {
+  const arg = process.argv.find(a => a.startsWith(prefix));
+  return arg === undefined ? undefined : arg.slice(prefix.length);
+};
+const TAGS = argValue('--tags=') || '';
+const FILE_ARG = argValue('--file=');
+const JSON_ARG = argValue('--json=');
+const PROJECT_ARG = (argValue('--project=') || '').toLowerCase();
 const TEXT_ARG = process.argv[2];
 const JSON_FILE = Boolean(FILE_ARG && FILE_ARG.toLowerCase().endsWith('.json'));
 const HAS_JSON = JSON_ARG !== undefined || JSON_FILE;
@@ -151,6 +155,7 @@ try {
     if (FULL_TAGS) saveArgs.push(`--tags=${FULL_TAGS}`);
     if (PROJECT_ARG) saveArgs.push(`--project=${PROJECT_ARG}`);
     if (PINNED) saveArgs.push('--pinned');
+    if (DRY_RUN) saveArgs.push('--dry-run');
     for (const arg of process.argv.filter(a => /^--(trust|verifier|evidence|scope|valid-from|valid-to)=/.test(a))) {
       saveArgs.push(arg);
     }

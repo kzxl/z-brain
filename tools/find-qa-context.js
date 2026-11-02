@@ -9,7 +9,7 @@
  *   node tools/find-qa-context.js "<task description>" [--tags=ua,winforms] [--limit=5]
  */
 
-const { pool, embed, tokenize, qaRankingQuery, normalizeTags, inferTags, storageAme, config, attachParents, queryRetrieval } = require('../core');
+const { pool, embed, tokenize, qaRankingQuery, normalizeTags, inferTags, storageAme, storageSqlite, config, attachParents, queryRetrieval } = require('../core');
 const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
@@ -107,21 +107,28 @@ function decomposeToQueries(taskDescription) {
 }
 
 async function resolveActiveBackend() {
+  if (BACKEND_ARG === 'sqlite' || config.backend === 'sqlite') return 'sqlite';
   if (BACKEND_ARG === 'ame') return 'ame';
   if (BACKEND_ARG === 'postgres' || BACKEND_ARG === 'pg') return 'postgres';
-  if (config.backend === 'ame') return 'ame';
-  if (config.backend === 'postgres') return 'postgres';
-
-  // auto mode: check if AME is ready
-  const status = await storageAme.isAmeAvailable();
-  if (status.available) return 'ame';
-  return 'postgres';
+  return 'sqlite'; // Default to pure local SQLite
 }
 
 /**
  * Search DB với 1 query, return top rows
  */
 async function searchOne(question, tagsFilter, activeBackend, project, allProjects) {
+  if (activeBackend === 'sqlite') {
+    try {
+      return storageSqlite.queryContext(question, {
+        limit: 5,
+        project: allProjects ? null : project
+      });
+    } catch (e) {
+      console.warn('[WARN] SQLite query failed:', e.message);
+      return [];
+    }
+  }
+
   if (activeBackend === 'ame') {
     try {
       return await storageAme.queryContext(question, {
@@ -161,7 +168,7 @@ async function searchOne(question, tagsFilter, activeBackend, project, allProjec
 async function findQAContext(taskDescription) {
   const activeBackend = await resolveActiveBackend();
   console.log(`[CONTEXT SWEEP] Task: "${taskDescription}"`);
-  console.log(`[CONTEXT SWEEP] Backend: ${activeBackend === 'ame' ? '⚡ AME (Sub-millisecond Cognitive)' : '🐘 PostgreSQL'}`);
+  console.log(`[CONTEXT SWEEP] Backend: ${activeBackend === 'sqlite' ? '⚡ SQLite (Pure Local Z-Brain)' : (activeBackend === 'ame' ? '⚡ AME (Sub-millisecond Cognitive)' : '🐘 PostgreSQL')}`);
   console.log(`[CONTEXT SWEEP] Scope: ${ALL_PROJECTS ? 'all projects (explicit)' : PROJECT ? `project:${PROJECT} + global` : 'global only'}`);
   console.log(`[CONTEXT SWEEP] Tags filter: ${TAGS.length > 0 ? TAGS.join(',') : 'none'}\n`);
 

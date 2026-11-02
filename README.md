@@ -50,6 +50,7 @@ graph TD
 - `tools/ingest-knowledge.js` validates each atom, gives it its own embedding, and links it to a parent `document` row via `parent_id` / `source_ref`.
 - Scope resolution is deterministic: explicit `--scope` wins, project-specific identifiers stay project-scoped, generic lessons inside a project become **global candidates** for review.
 - `save-qa` rejects answers over 2000 characters unless `--allow-long`; `post-task --direct` requires `<problem> | <cause> | <fix>`.
+- `--dry-run` works on every write path (`save-qa`, `post-task --direct`, `post-task --json`, `ingest-knowledge`): it validates the input, prints the resolved project/scope/evidence, and writes nothing.
 - Review candidates with `node tools/review-scope.js`; approve promotes to global, reject keeps project scope.
 
 ### 2.2. Trust & Provenance
