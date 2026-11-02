@@ -1,9 +1,12 @@
 {
-  "name": "agentic-brain",
-  "version": "1.1.0",
-  "description": "Agentic Brain — Episodic Semantic Memory Engine for AI Agents (PostgreSQL + pgvector + BGE-M3)",
+  "name": "z-brain",
+  "version": "1.2.0",
+  "description": "Z-Brain — Zero-overhead local episodic knowledge engine and Antigravity/ZCode plugin for AI coding agents with SQLite FTS5 progressive disclosure (L0 Index / L2 View)",
   "main": "server.js",
   "scripts": {
+    "cli": "node plugins/z-brain/scripts/cli.mjs",
+    "mcp": "node plugins/z-brain/scripts/mcp-server.mjs",
+    "install:plugin": "powershell -ExecutionPolicy Bypass -File install.ps1",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "proxy": "node openai-proxy.js",
