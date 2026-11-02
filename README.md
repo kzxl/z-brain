@@ -1,3 +1,16 @@
+# ⚠️ [ARCHIVED] Repository Moved to [kzxl/z-plugin](https://github.com/kzxl/z-plugin)
+
+> [!IMPORTANT]
+> **This repository has been archived and consolidated into the official [`z-plugin`](https://github.com/kzxl/z-plugin) monorepo.**
+> 
+> All active development, updates, and releases for **`z-brain`** (along with `z-token`) now live at:
+> 
+> 👉 **[https://github.com/kzxl/z-plugin/tree/main/plugins/z-brain](https://github.com/kzxl/z-plugin/tree/main/plugins/z-brain)**
+> 
+> This repository is kept in **read-only archive mode** to preserve the complete development history from Phase 0 to Phase 4.
+
+---
+
 # 🧠 z-brain — Zero-Overhead Local Memory Engine & Plugin for AI Agents
 
 [![Runtime](https://img.shields.io/badge/Runtime-Node.js%2022+-339933?logo=node.js)](https://nodejs.org)
