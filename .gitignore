@@ -8,3 +8,10 @@ data/.last-decision-cache.json
 *.ame
 data/backup/
 .project-rule.md
+
+# SQLite local databases and WAL files (internal private knowledge)
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3
+plugins/z-brain/data/*.sqlite*
