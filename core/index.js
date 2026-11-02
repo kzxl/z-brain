@@ -18,6 +18,7 @@ const { ingestText } = require('./ingest');
 const { attachParents } = require('./parents');
 const { queryRetrieval } = require('./retrieval-db');
 const { normalizeTrustLevel, TRUST_LEVELS, trustRank } = require('./trust');
+const storageSqlite = require('./storage-sqlite');
 
 module.exports = {
   config,
@@ -28,6 +29,7 @@ module.exports = {
   callServer, streamServer, isServerUp, PORT: SERVER_PORT,
   qaRankingQuery, recipeRankingQuery, skillRankingQuery, tokenize,
   storageAme,
+  storageSqlite,
   captureKnowledge,
   resolveScope,
   normalizeKnowledge,

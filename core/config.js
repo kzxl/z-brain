@@ -7,16 +7,15 @@
 const path = require('path');
 const fs = require('fs');
 
-// Tìm .env file: ưu tiên cwd (nơi chạy node), fallback về thư mục project
+// Tìm .env file: ưu tiên thư mục SemanticBrain, fallback về cwd
 const envPaths = [
-  path.join(process.cwd(), '.env'),
   path.join(__dirname, '..', '.env'),
+  path.join(process.cwd(), '.env'),
 ];
 
 for (const envPath of envPaths) {
   if (fs.existsSync(envPath)) {
-    require('dotenv').config({ path: envPath });
-    break;
+    require('dotenv').config({ path: envPath, override: true });
   }
 }
 
@@ -43,7 +42,7 @@ const config = {
     name: process.env.DOMAIN_NAME || 'My Project',
     description: process.env.DOMAIN_DESCRIPTION || 'chuyên gia hệ thống phần mềm',
   },
-  backend: process.env.MEMORY_BACKEND || 'postgres', // 'ame' | 'postgres'
+  backend: process.env.MEMORY_BACKEND || 'sqlite', // 'sqlite' | 'ame' | 'postgres'
   server: {
     port: parseInt(process.env.SEMANTIC_PORT || '3457'),
     host: process.env.BIND_HOST || '127.0.0.1',

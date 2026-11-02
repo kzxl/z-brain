@@ -58,7 +58,7 @@ const crypto = require('crypto');
 
 let tableChecked = false;
 async function ensureCacheTable() {
-  if (tableChecked) return;
+  if (tableChecked || config.backend === 'sqlite') return;
   try {
     const pool = require('./db');
     await pool.query(`
@@ -80,6 +80,7 @@ function getMd5(text) {
 }
 
 async function getDatabaseCachedEmbedding(text) {
+  if (config.backend === 'sqlite') return null;
   try {
     await ensureCacheTable();
     const hash = getMd5(text.trim().toLowerCase());
@@ -102,6 +103,7 @@ async function getDatabaseCachedEmbedding(text) {
 }
 
 async function saveDatabaseCachedEmbedding(text, embedding) {
+  if (config.backend === 'sqlite') return;
   try {
     await ensureCacheTable();
     const hash = getMd5(text.trim().toLowerCase());

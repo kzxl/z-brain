@@ -8,9 +8,11 @@
  *
  * Usage:
  *   node tools/save-qa.js "<Question>" "<Answer>" [--source=manual] [--confidence=0.5]
- *        [--category=general] [--tags=a,b] [--project=erp] [--pinned]
+ *        [--category=general] [--tags=a,b] [--project=erp] [--pinned] [--dry-run]
+ *
+ *   --dry-run prints what would be written and exits without touching the database.
  */
-const { pool, storageAme, config, captureKnowledge } = require('../core');
+const { pool, storageAme, storageSqlite, config, captureKnowledge } = require('../core');
 
 function parseArgs(args) {
   const opts = {
@@ -28,32 +30,36 @@ function parseArgs(args) {
     validTo: null,
     status: null,
     evidence: [],
+    dryRun: false,
   };
+  // Values may legitimately contain '=' (file paths, evidence URIs), so never split.
+  const valueOf = (arg, prefix) => arg.slice(prefix.length);
   for (const arg of args) {
-    if (arg.startsWith('--source=')) opts.source = arg.split('=')[1];
-    else if (arg.startsWith('--category=')) opts.category = arg.split('=')[1];
-    else if (arg.startsWith('--confidence=')) opts.confidence = parseFloat(arg.split('=')[1]);
-    else if (arg.startsWith('--tags=')) opts.tags = arg.split('=')[1].split(',').map(t => t.trim()).filter(Boolean);
-    else if (arg.startsWith('--project=')) opts.project = arg.split('=')[1].trim().toLowerCase();
+    if (arg.startsWith('--source=')) opts.source = valueOf(arg, '--source=');
+    else if (arg.startsWith('--category=')) opts.category = valueOf(arg, '--category=');
+    else if (arg.startsWith('--confidence=')) opts.confidence = parseFloat(valueOf(arg, '--confidence='));
+    else if (arg.startsWith('--tags=')) opts.tags = valueOf(arg, '--tags=').split(',').map(t => t.trim()).filter(Boolean);
+    else if (arg.startsWith('--project=')) opts.project = valueOf(arg, '--project=').trim().toLowerCase();
     else if (arg.startsWith('--scope=')) {
-      const scope = arg.split('=')[1].trim().toLowerCase();
+      const scope = valueOf(arg, '--scope=').trim().toLowerCase();
       if (scope === 'global' || scope === 'project') opts.scope = scope;
     }
-    else if (arg.startsWith('--trust=')) opts.trustLevel = arg.split('=')[1];
-    else if (arg.startsWith('--verifier=')) opts.verifier = arg.slice('--verifier='.length);
-    else if (arg.startsWith('--valid-from=')) opts.validFrom = arg.slice('--valid-from='.length);
-    else if (arg.startsWith('--valid-to=')) opts.validTo = arg.slice('--valid-to='.length);
-    else if (arg.startsWith('--status=')) opts.status = arg.split('=')[1];
-    else if (arg.startsWith('--evidence=')) opts.evidence = arg.split('=')[1].split(',').map(t => t.trim()).filter(Boolean);
+    else if (arg.startsWith('--trust=')) opts.trustLevel = valueOf(arg, '--trust=');
+    else if (arg.startsWith('--verifier=')) opts.verifier = valueOf(arg, '--verifier=');
+    else if (arg.startsWith('--valid-from=')) opts.validFrom = valueOf(arg, '--valid-from=');
+    else if (arg.startsWith('--valid-to=')) opts.validTo = valueOf(arg, '--valid-to=');
+    else if (arg.startsWith('--status=')) opts.status = valueOf(arg, '--status=');
+    else if (arg.startsWith('--evidence=')) opts.evidence = valueOf(arg, '--evidence=').split(',').map(t => t.trim()).filter(Boolean);
     else if (arg === '--pinned') opts.pinned = true;
     else if (arg === '--allow-long') opts.allowLong = true;
+    else if (arg === '--dry-run') opts.dryRun = true;
   }
   return opts;
 }
 
 async function saveQA(question, answer) {
   if (!question || !answer) {
-    console.log('Usage: node save-qa.js "<Question>" "<Answer>" [--source=manual] [--confidence=0.5] [--category=general] [--tags=a,b] [--project=erp] [--scope=global|project] [--trust=...) [--verifier=...] [--pinned] [--allow-long]');
+    console.log('Usage: node save-qa.js "<Question>" "<Answer>" [--source=manual] [--confidence=0.5] [--category=general] [--tags=a,b] [--project=erp] [--scope=global|project] [--trust=...) [--verifier=...] [--evidence=...] [--pinned] [--allow-long] [--dry-run]');
     process.exit(1);
   }
 
@@ -64,7 +70,23 @@ async function saveQA(question, answer) {
     process.exit(1);
   }
 
+  if (opts.dryRun) {
+    console.log('[DRY-RUN] No rows written.');
+    console.log(`  project: ${opts.project || 'global'} | scope: ${opts.scope || 'auto'} | source: ${opts.source} | trust: ${opts.trustLevel || 'auto'}`);
+    console.log(`  Q: ${question}`);
+    console.log(`  A: ${answer}`);
+    if (opts.tags.length) console.log(`  tags: ${opts.tags.join(',')}`);
+    if (opts.evidence.length) console.log(`  evidence: ${opts.evidence.join(',')}`);
+    return;
+  }
+
   try {
+    if (config.backend === 'sqlite') {
+      const res = storageSqlite.saveQA(question, answer, opts);
+      console.log(`[+] SQLite saved id=${res.id} [project: ${opts.project || 'global'}]`);
+      return;
+    }
+
     // AME is opt-in. backend=ame requires it; backend=postgres does not.
     const ameEnabled = config.ame?.write === true || config.backend === 'ame';
     let ameSaved = false;
