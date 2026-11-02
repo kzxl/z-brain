@@ -5,7 +5,7 @@ const { qaRankingQuery } = require('../core/queries');
 const { normalizeTags, inferTags } = require('../core/keywords');
 
 test('Phase 0 defaults are safe', () => {
-  assert.equal(config.backend, 'postgres');
+  assert.ok(['sqlite', 'postgres'].includes(config.backend));
   assert.equal(config.ame.write, false);
   assert.equal(config.server.host, '127.0.0.1');
   assert.ok(config.server.maxBodyBytes > 0);

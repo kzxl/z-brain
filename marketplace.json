@@ -1,0 +1,26 @@
+{
+  "name": "agentic-brain",
+  "owner": {
+    "name": "kzxl",
+    "url": "https://github.com/kzxl"
+  },
+  "plugins": [
+    {
+      "name": "z-brain",
+      "source": "./plugins/z-brain",
+      "version": "1.0.0",
+      "description": "Local zero-overhead knowledge engine for AI agents with SQLite FTS5 progressive disclosure (L0 Index / L2 View).",
+      "displayName": "Z-Brain (Agentic Brain)",
+      "category": "developer-tools",
+      "keywords": [
+        "memory",
+        "context",
+        "sqlite",
+        "fts5",
+        "mcp",
+        "antigravity",
+        "zcode"
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = process.env.ZBRAIN_DB_PATH || 'C:\\Users\\phong.vo\\source\\repos\\z-brain\\plugins\\z-brain\\data\\zbrain.sqlite';
+const DB_PATH = process.env.ZBRAIN_DB_PATH || path.resolve(__dirname, '..', 'plugins', 'z-brain', 'data', 'zbrain.sqlite');
 
 let _db = null;
 
@@ -54,10 +54,12 @@ function queryContext(query, opts = {}) {
     return rows.map(r => ({
       id: r.id,
       question: r.question,
+      answer: r.answer,
       answer_context: r.answer,
       gotcha_fix: r.gotcha_fix,
       tags: typeof r.tags === 'string' ? JSON.parse(r.tags || '[]') : r.tags,
       project_id: r.project_id,
+      scope: r.scope,
       trust_level: r.trust_level,
       score: 1.0 - (r.bm25_rank / 100)
     }));

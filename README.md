@@ -1,10 +1,10 @@
 # 🧠 agentic-brain — Episodic Semantic Memory Engine for AI Agents
 
-**agentic-brain** is an offline, high-performance episodic and semantic memory engine for autonomous AI coding agents (Claude, Gemini, Cursor, Cline, OpenCode). Powered by PostgreSQL with `pgvector` and local BGE-M3 embeddings, it functions as the long-term memory substrate (Tier L2/L3) within the [agentic-core](https://github.com/kzxl/agentic-core) enterprise operating system.
+**agentic-brain** is a high-performance episodic and semantic memory engine for autonomous AI coding agents (Claude, Gemini, Cursor, Cline, OpenCode, Antigravity, ZCode). It supports both pure local embedded storage via SQLite FTS5 (`z-brain` plugin) and enterprise multi-project vector search. It functions as the long-term memory substrate (Tier L2/L3) within the [agentic-core](https://github.com/kzxl/agentic-core) enterprise operating system.
 
-> Documentation: [docs/README.md](docs/README.md) · Remaining work: [docs/next-steps.md](docs/next-steps.md)
+> Documentation: [docs/README.md](docs/README.md) · Plugin Package: [plugins/z-brain](plugins/z-brain) · Remaining work: [docs/next-steps.md](docs/next-steps.md)
 
-**Status:** Phase 0–3 implemented (scope, atomic ingestion, project_id/trust, ANN-first, lifecycle, parent context). 27/27 tests; fresh-install migrations verified. Production hardening and Phase 4–5 are tracked in [next-steps.md](docs/next-steps.md).
+**Status:** Phase 0–4 implemented (scope, atomic ingestion, project_id/trust, ANN-first, lifecycle, parent context, and Phase 4: Local SQLite FTS5 Engine with Antigravity/ZCode Plugin & MCP server). 27/27 tests verified.
 
 ---
 
